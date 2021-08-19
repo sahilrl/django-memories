@@ -24,24 +24,6 @@
 </head>
 
 <body>
-    <!-- Facebook javascript SDK async load -->
-    <script>
-        window.fbAsyncInit = function() {
-            FB.init({
-            appId            : 4234105266683469,
-            autoLogAppEvents : true,
-            xfbml            : true,
-            version          : 'v11.0'
-            });
-        };
-    </script>
-    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
-    <!-- Facebook SDK ends -->
-
-
-<div class="fb-login-button" data-width="" data-size="" data-button-type="" data-layout="" data-auto-logout-link="" data-use-continue-as=""></div>
-    
-  <!-- your content here... -->
-  
+  <a href="{% url 'login_facebook' %}">Login</a>
 </body>
 </html>
