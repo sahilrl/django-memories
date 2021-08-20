@@ -2,3 +2,4 @@ django
 gunicorn
 django_heroku
 requests
+python-decouple
