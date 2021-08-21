@@ -16,12 +16,24 @@ def home(request):
 def login_facebook(request):
     app_id = config('app-id')
     app_secret = config('app-secret')
+
     if (request.get_full_path_info() == "/login_facebook/"):
-        return HttpResponseRedirect('https://www.facebook.com/v11.0/dialog/oauth?client_id=365167805111881&redirect_uri=http://localhost:8000/login_facebook/&state={"{st=state123abc,ds=123456789}"}')
+        return HttpResponseRedirect(f'https://www.facebook.com/v11.0/dialog/oauth?client_id={app_id}&redirect_uri=http://localhost:8000/login_facebook/&state={"{st=state123abc,ds=123456789}"}')
     else:
         req = urlparse(request.get_full_path_info())
         req = req.query.split('&')
         req = req[0].replace('code=','')
-        access = requests.get(f'https://graph.facebook.com/v11.0/oauth/access_token?client_id={app_id}&redirect_uri=http://localhost:8000/login_facebook/&client_secret={app_secret}&code={req}')
-        print('THis is another one ', access.json())
+
+        access_token = requests.get(f'https://graph.facebook.com/v11.0/oauth/access_token?client_id={app_id}&redirect_uri=http://localhost:8000/login_facebook/&client_secret={app_secret}&code={req}')
+        access_token = access_token.json()
+        access_token = access_token.get("access_token")
+        # print(f"The access token is {access_token}")
+    
+        app_access_token = requests.get(f"https://graph.facebook.com/oauth/access_token?client_id={app_id}&client_secret={app_secret}&grant_type=client_credentials")
+        app_access_token = app_access_token.json()
+        app_access_token = app_access_token.get("access_token")
+        # print('This is the app access token',app_access_token,'\n')
+
+        check = requests.get(f'https://graph.facebook.com/debug_token?input_token={access_token}&access_token={app_access_token}')
+        # print(check.json())
         return HttpResponse('done')
