@@ -12,9 +12,9 @@ fi
 #echo "ALLOWED_HOSTS='localhost'" >> .env
 #echo "SECURE_SSL_REDIRECT=False" >> .env
 source env/bin/activate
-cd memories
-pip3 install -r requirements.txt
-python3 manage.py makemigrations
-python3 manage.py migrate
-python3 manage.py runserver
+cd django-memories
+pip install -r requirements.txt
+python manage.py makemigrations
+python manage.py migrate
+python manage.py runserver
 
