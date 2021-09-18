@@ -13,6 +13,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from main.views import memoriesapp
 from django.contrib import admin
 from django.urls import path
 from . import views
@@ -20,4 +21,5 @@ from . import views
 urlpatterns = [
     path('', views.home),
     path('login_facebook/', views.login_facebook, name='login_facebook'),
+    path('memoriesapp/', views.memoriesapp, name='memoriesapp' )
 ]
