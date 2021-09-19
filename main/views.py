@@ -11,13 +11,22 @@ import requests
 from .models import Facebook
 
 def home(request):
-    return render(request, 'main/index.html')
+    try:
+        user_id = request.session['login_status']
+        print(user_id)
+        sa = Facebook.objects.filter(user_id = user_id)
+        print(sa)
+        global getprofile
+        def getprofile():
+            return user_id
+        return redirect('memoriesapp')
+    except:
+        return render(request, 'main/login.html')
 
 
-def login_facebook(request):
+def login_facebook(request):  
     app_id = config('app-id')
     app_secret = config('app-secret')
-
     if (request.get_full_path_info() == "/login_facebook/"):
         print(request)
         return HttpResponseRedirect(f'https://www.facebook.com/v11.0/dialog/oauth?client_id={app_id}&redirect_uri=http://localhost:8000/login_facebook/&state={"{st=state123abc,ds=123456789}&scope=email"}')
@@ -37,16 +46,17 @@ def login_facebook(request):
         name, email, picture = profile['name'], profile['email'], profile['picture'].get('data')['url']
         try:
             Facebook.objects.get(user_id=user_id)
-            Facebook.objects.filter(user_id=user_id).update(name=name, email=email, access_token=access_token, user_id=user_id, login_status=True)
+            Facebook.objects.filter(user_id=user_id).update(name=name, email=email, access_token=access_token, user_id=user_id)
         except Facebook.DoesNotExist:
-            some = Facebook(name=name, email=email, access_token=access_token, user_id=user_id, login_status=True) 
+            some = Facebook(name=name, email=email, access_token=access_token, user_id=user_id) 
             some.save()
-        global getprofile
-        def getprofile():
-            return name, email, picture
-        return redirect('memoriesapp')
+        request.session['login_status'] = user_id
+    global getprofile
+    def getprofile():
+        return user_id
+    return redirect('memoriesapp')
 
 def memoriesapp(request):
-    name, email, picture = getprofile()
-    dict = {'name':name, 'email':email}
+    user_id = getprofile()
+    dict = {'user_id':user_id}
     return render(request, 'main/app.html', dict)
