@@ -1,9 +1,8 @@
 from django.db import models
 
 class Facebook(models.Model):
-    access_token = models.CharField(max_length=500)
     user_id = models.IntegerField()
-    login_status = models.BooleanField(default=False)
+    access_token = models.CharField(max_length=500)
     name = models.CharField(max_length=500)
     email = models.EmailField()
     def __str__(self):

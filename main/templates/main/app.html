@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>A Basic HTML5 Template {{ name }</title>
+  <title>Memories</title>
   <meta name="description" content="A simple HTML5 Template for new projects.">
   <meta name="author" content="SitePoint">
 
@@ -23,7 +23,9 @@
 </head>
 
 <body>
-  <p>Hello</p>
-  <!-- <p>Email: {{ email }}</p> -->
+  {% for person in data %}
+  <p>Hello {{ person.name }}</p>
+  <p>Email: {{ person.email }}</p>
+  {% endfor %}
 </body>
 </html>

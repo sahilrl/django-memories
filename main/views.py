@@ -12,9 +12,11 @@ import requests
 from .models import Facebook
 
 @login_required
-def home(request):
-    print(request.session['login_status'])
-    return render(request, 'main/app.html')
+def home(request, user_id):
+    data = Facebook.objects.filter(email='sahilrohilla03@gmail.com')
+    dict = {'user_id':user_id,
+            'data':data}
+    return render(request, 'main/app.html', dict)
 
 
 def login_facebook(request):  
