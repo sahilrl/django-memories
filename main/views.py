@@ -42,6 +42,8 @@ def login_facebook(request):
         name, email, picture_url = profile['name'], profile['email'], profile['picture'].get('data')['url']
         # Getting profile picture
         picture = requests.get(picture_url, stream = True )
+
+        defaults={'name':name, 'email':email, 'access_token':access_token, 'user_id':user_id}
         if picture.status_code == 200:
             picture_name = f'main/profiles/{user_id}.jpg'
             picture.raw.decode_content = True
@@ -49,15 +51,8 @@ def login_facebook(request):
             with open(f'{settings.BASE_DIR}/main/static/{picture_name}', 'wb') as f:
                 shutil.copyfileobj(picture.raw, f)
 
-            Facebook.objects.filter(user_id=user_id).update_or_create(name=name, email=email, user_id=user_id, image=picture_name,
-                                                                        defaults={'name':name, 'email':email, 'access_token':access_token, 'user_id':user_id, 'image':picture_name},
-                                                                    )
-        else:
-            Facebook.objects.filter(user_id=user_id).update_or_create(name=name, email=email, user_id=user_id,
-                                                                        defaults={'name':name, 'email':email, 'access_token':access_token, 'user_id':user_id},
-                                                                    )
+            defaults['image'] = picture_name
+
+        Facebook.objects.update_or_create(user_id=user_id, defaults=defaults)
         request.session['login_status'] = user_id
-    global getprofile
-    def getprofile():
-        return user_id
     return redirect('home')
