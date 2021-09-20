@@ -10,6 +10,9 @@ from urllib.parse import urlparse
 from decouple import config
 import requests
 from .models import Facebook
+import shutil # to save image on computer
+from django.conf import settings
+# from urllib.request import urlopen
 
 @login_required
 def home(request, user_id):
@@ -23,10 +26,8 @@ def login_facebook(request):
     app_id = config('app-id')
     app_secret = config('app-secret')
     if (request.get_full_path_info() == "/login_facebook/"):
-        print(request)
         return HttpResponseRedirect(f'https://www.facebook.com/v11.0/dialog/oauth?client_id={app_id}&redirect_uri=http://localhost:8000/login_facebook/&state={"{st=state123abc,ds=123456789}&scope=email"}')
     else:
-        print(request)
         req = urlparse(request.get_full_path_info())
         req = req.query.split('&')
         req = req[0].replace('code=','')
@@ -38,7 +39,14 @@ def login_facebook(request):
         user_id = check.json().get("data")["user_id"]
         profile = requests.get(f'https://graph.facebook.com/{user_id}?fields=id,name,email,picture.width(400).height(400)&access_token={access_token}&client_secret={app_secret}&client_id={app_id}')
         profile = profile.json()
-        name, email, picture = profile['name'], profile['email'], profile['picture'].get('data')['url']
+        name, email, picture_url = profile['name'], profile['email'], profile['picture'].get('data')['url']
+        picture = requests.get(picture_url, stream = True )
+        picture_name = f'{settings.BASE_DIR}/main/static/main/profiles/{user_id}.jpg'
+        if picture.status_code == 200:
+            picture.raw.decode_content = True
+
+            with open(picture_name, 'wb') as f:
+                shutil.copyfileobj(picture.raw, f)
         try:
             Facebook.objects.get(user_id=user_id)
             Facebook.objects.filter(user_id=user_id).update(name=name, email=email, access_token=access_token, user_id=user_id)

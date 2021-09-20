@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from functools import wraps
+
+
 def login_required(view_func):
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):
