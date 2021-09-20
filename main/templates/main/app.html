@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en">
+  {% load static %}
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -24,6 +25,7 @@
 
 <body>
   {% for person in data %}
+  <img src="{% static person.image %}" alt="Girl in a jacket" width="500" height="500"> 
   <p>Hello {{ person.name }}</p>
   <p>Email: {{ person.email }}</p>
   {% endfor %}

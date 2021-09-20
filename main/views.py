@@ -16,7 +16,7 @@ from django.conf import settings
 
 @login_required
 def home(request, user_id):
-    data = Facebook.objects.filter(email='sahilrohilla03@gmail.com')
+    data = Facebook.objects.filter(user_id=user_id)
     dict = {'user_id':user_id,
             'data':data}
     return render(request, 'main/app.html', dict)
