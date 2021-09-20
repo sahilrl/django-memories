@@ -1,3 +1,4 @@
+from .decorators import login_required
 from types import FrameType
 from typing import get_type_hints
 from django.db.models.fields import EmailField
@@ -10,18 +11,10 @@ from decouple import config
 import requests
 from .models import Facebook
 
+@login_required
 def home(request):
-    try:
-        user_id = request.session['login_status']
-        print(user_id)
-        sa = Facebook.objects.filter(user_id = user_id)
-        print(sa)
-        global getprofile
-        def getprofile():
-            return user_id
-        return redirect('memoriesapp')
-    except:
-        return render(request, 'main/login.html')
+    print(request.session['login_status'])
+    return render(request, 'main/app.html')
 
 
 def login_facebook(request):  
@@ -54,9 +47,4 @@ def login_facebook(request):
     global getprofile
     def getprofile():
         return user_id
-    return redirect('memoriesapp')
-
-def memoriesapp(request):
-    user_id = getprofile()
-    dict = {'user_id':user_id}
-    return render(request, 'main/app.html', dict)
+    return redirect('home')
