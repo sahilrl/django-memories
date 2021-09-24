@@ -9,14 +9,14 @@ from django.shortcuts import redirect
 from urllib.parse import urlparse
 from decouple import config
 import requests
-from .models import Facebook
+from .models import User
 import shutil # to save image on computer
 from django.conf import settings
 # from urllib.request import urlopen
 
 @login_required
 def home(request, user_id):
-    data = Facebook.objects.filter(user_id=user_id)
+    data = User.objects.filter(user_id=user_id)
     dict = {'user_id':user_id,
             'data':data}
     return render(request, 'main/app.html', dict)
@@ -53,6 +53,6 @@ def login_facebook(request):
 
             defaults['image'] = picture_name
 
-        Facebook.objects.update_or_create(user_id=user_id, defaults=defaults)
+        User.objects.update_or_create(user_id=user_id, defaults=defaults)
         request.session['login_status'] = user_id
     return redirect('home')

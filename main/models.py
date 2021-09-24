@@ -1,6 +1,8 @@
 from django.db import models
 
-class Facebook(models.Model):
+from django.contrib.auth.models import AbstractUser
+
+class User(AbstractUser):
     user_id = models.IntegerField()
     access_token = models.CharField(max_length=500)
     name = models.CharField(max_length=500)
@@ -12,5 +14,5 @@ class Facebook(models.Model):
 class Messages(models.Model):
     message = models.TextField(null=True, blank=True)
     Location = models.CharField(max_length=500, null=True, blank=True)
-    models.ForeignKey(Facebook, on_delete=models.CASCADE)
+    models.ForeignKey(User, on_delete=models.CASCADE)
 

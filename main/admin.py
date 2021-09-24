@@ -1,4 +1,5 @@
 from django.contrib import admin
-from .models import Facebook
+from django.contrib.auth.admin import UserAdmin
+from .models import User
 
-admin.site.register(Facebook)
+admin.site.register(User, UserAdmin)
