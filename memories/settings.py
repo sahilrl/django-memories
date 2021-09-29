@@ -129,3 +129,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # substituting user model
 AUTH_USER_MODEL = 'main.User'
+
+# redirect login_required setting
+LOGIN_URL = 'login'

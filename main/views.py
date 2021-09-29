@@ -1,4 +1,4 @@
-from .decorators import login_required
+from django.contrib.auth.decorators import login_required
 from types import FrameType
 from typing import get_type_hints
 from django.db.models.fields import EmailField
@@ -20,6 +20,9 @@ def home(request, user_id):
     dict = {'user_id':user_id,
             'data':data}
     return render(request, 'main/app.html', dict)
+
+def login(request):
+    return render(request, 'main/login.html')
 
 
 def login_facebook(request):  
@@ -43,7 +46,7 @@ def login_facebook(request):
         # Getting profile picture
         picture = requests.get(picture_url, stream = True )
 
-        defaults={'name':name, 'email':email, 'access_token':access_token, 'user_id':user_id}
+        # defaults={'name':name, 'email':email, 'access_token':access_token, 'user_id':user_id}
         if picture.status_code == 200:
             picture_name = f'main/profiles/{user_id}.jpg'
             picture.raw.decode_content = True
@@ -51,8 +54,12 @@ def login_facebook(request):
             with open(f'{settings.BASE_DIR}/main/static/{picture_name}', 'wb') as f:
                 shutil.copyfileobj(picture.raw, f)
 
-            defaults['image'] = picture_name
+            # defaults['image'] = picture_name
 
-        User.objects.update_or_create(user_id=user_id, defaults=defaults)
+        # User.objects.update_or_create(user_id=user_id, defaults=defaults)
+            user = User.objects.create_user(email=email,access_token=access_token,name=name,picture_name=picture_name,user_id=user_id)
+
+        # Now user needs authentication and login()
+
         request.session['login_status'] = user_id
     return redirect('home')
