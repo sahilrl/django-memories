@@ -57,7 +57,7 @@ def login_facebook(request):
             # defaults['image'] = picture_name
 
         # User.objects.update_or_create(user_id=user_id, defaults=defaults)
-            user = User.objects.create_user(email=email,access_token=access_token,name=name,picture_name=picture_name,user_id=user_id)
+            user = User.objects.create_user(email=email,access_token=access_token,name=name,user_id=user_id)
 
         # Now user needs authentication and login()
 

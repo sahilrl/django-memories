@@ -11,15 +11,34 @@ class UserManager(BaseUserManager):
         """
         if not email:
             raise ValueError('Users must have an email address')
-
-        user = self.model(
-            email=self.normalize_email(email),
-            **extra_fields
-        )
-        
-        user.set_password(password)
-        user.save(using=self._db)
+        try:
+            user = self.get(email=email)
+            print(user.email)
+        except User.DoesNotExist:
+            user = self.model(
+                email=self.normalize_email(email),
+                **extra_fields
+            )
+            
+            user.set_password(password)
+            user.save(using=self._db)
         return user
+    
+    # def create_superuser(self, email, password=None):
+    #     """
+    #     Creates and saves a superuser with the given email, date of
+    #     birth and password.
+    #     """
+    #     user = self.create_user(
+    #         email,
+    #         password=password,
+    #     )
+    #     user.is_admin = True
+    #     user.is_staff = True
+    #     user.save(using=self._db)
+    #     return user
+
+
 
 
 class User(AbstractBaseUser):
@@ -28,9 +47,11 @@ class User(AbstractBaseUser):
     email = models.EmailField(verbose_name='email address', max_length=255, unique=True)
     image = models.CharField(max_length=500, default='/main/profiles/default.jpg')
     access_token = models.CharField(max_length=500)
-    password = models.CharField(max_length=500)  
+    password = models.CharField(max_length=500, null=True, blank=True) 
+
+    is_active = models.BooleanField(default=True)
+
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['date_of_birth']
 
     objects = UserManager()
     def __str__(self):
