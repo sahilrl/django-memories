@@ -24,6 +24,9 @@ class UserManager(BaseUserManager):
             user.save(using=self._db)
         return user
     
+    def get_by_natural_key(self, email):
+        return self.get(email=email)
+    
     # def create_superuser(self, email, password=None):
     #     """
     #     Creates and saves a superuser with the given email, date of

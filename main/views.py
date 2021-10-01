@@ -12,16 +12,23 @@ import requests
 from .models import User
 import shutil # to save image on computer
 from django.conf import settings
+from .backends import UserBackend
+from django.contrib.auth import authenticate, login
+Backend = UserBackend()
+
 # from urllib.request import urlopen
 
 @login_required
-def home(request, user_id):
+def home(request):
+    user = request.user
+    user_id = user.user_id
+    print(user_id)
     data = User.objects.filter(user_id=user_id)
     dict = {'user_id':user_id,
             'data':data}
     return render(request, 'main/app.html', dict)
 
-def login(request):
+def login_template(request):
     return render(request, 'main/login.html')
 
 
@@ -36,6 +43,7 @@ def login_facebook(request):
         req = req[0].replace('code=','')
         access_token = requests.get(f'https://graph.facebook.com/v11.0/oauth/access_token?client_id={app_id}&redirect_uri=http://localhost:8000/login_facebook/&client_secret={app_secret}&code={req}')
         access_token = access_token.json().get("access_token")
+        print(access_token)
         app_access_token = requests.get(f"https://graph.facebook.com/oauth/access_token?client_id={app_id}&client_secret={app_secret}&grant_type=client_credentials")
         app_access_token = app_access_token.json().get("access_token")
         check = requests.get(f'https://graph.facebook.com/debug_token?input_token={access_token}&access_token={app_access_token}')
@@ -46,7 +54,7 @@ def login_facebook(request):
         # Getting profile picture
         picture = requests.get(picture_url, stream = True )
 
-        # defaults={'name':name, 'email':email, 'access_token':access_token, 'user_id':user_id}
+        defaults={'name':name, 'email':email, 'access_token':access_token, 'user_id':user_id}
         if picture.status_code == 200:
             picture_name = f'main/profiles/{user_id}.jpg'
             picture.raw.decode_content = True
@@ -54,12 +62,13 @@ def login_facebook(request):
             with open(f'{settings.BASE_DIR}/main/static/{picture_name}', 'wb') as f:
                 shutil.copyfileobj(picture.raw, f)
 
-            # defaults['image'] = picture_name
+            defaults['image'] = picture_name
 
-        # User.objects.update_or_create(user_id=user_id, defaults=defaults)
-            user = User.objects.create_user(email=email,access_token=access_token,name=name,user_id=user_id)
+        User.objects.update_or_create(user_id=user_id, defaults=defaults)
+        user = Backend.get_user(user_id)
+        print(user)
+        login(request, user)
+        
 
-        # Now user needs authentication and login()
-
-        request.session['login_status'] = user_id
+        # request.session['login_status'] = user_id
     return redirect('home')
