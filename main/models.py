@@ -63,5 +63,5 @@ class User(AbstractBaseUser):
 class Messages(models.Model):
     message = models.TextField(null=True, blank=True)
     Location = models.CharField(max_length=500, null=True, blank=True)
-    models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 

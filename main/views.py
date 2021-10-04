@@ -14,23 +14,30 @@ import shutil # to save image on computer
 from django.conf import settings
 from .backends import UserBackend
 from django.contrib.auth import authenticate, login
+from .forms import LoginForm
+from django.contrib.auth.views import LoginView
 Backend = UserBackend()
-
+from django.conf import settings
 # from urllib.request import urlopen
 
 @login_required
 def home(request):
     user = request.user
     user_id = user.user_id
-    print(user_id)
     data = User.objects.filter(user_id=user_id)
     dict = {'user_id':user_id,
             'data':data}
     return render(request, 'main/app.html', dict)
 
-def login_template(request):
-    return render(request, 'main/login.html')
-
+# def login_normal(request):
+#     if request.method == 'POST':
+#         form = LoginForm(request.POST)
+#         if form.is_valid():
+#             user = authenticate(form.email, form.password)
+#             login(user)
+#     else:
+#         form = LoginForm()
+#     return render(request, 'templates/registration/login.html', {'form': form})
 
 def login_facebook(request):  
     app_id = config('app-id')
@@ -69,6 +76,19 @@ def login_facebook(request):
         print(user)
         login(request, user)
         
-
-        # request.session['login_status'] = user_id
     return redirect('home')
+
+
+class LoginView(LoginView):
+    form_class = LoginForm
+    # form_class = AuthenticationForm
+    authentication_form = None
+    next_page = None
+    redirect_field_name = settings.REDIRECT_FIELD_NAME
+    template_name = 'registration/login.html'
+    redirect_authenticated_user = False
+    extra_context = None
+    email =  form_class.email
+    password = form_class.password
+    user = authenticate(email,password)
+    login(user)
