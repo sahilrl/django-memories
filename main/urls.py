@@ -20,6 +20,6 @@ from . import views
 urlpatterns = [
     path('', views.home, name='home'),
     path('login_facebook/', views.login_facebook, name='login_facebook'),
-    # path('login/', views.login_template, name='login'),
-    path('accounts/', include('django.contrib.auth.urls')), # new
+    path('login/', views.login_normal, name='login'),
+    # path('accounts/', include('django.contrib.auth.urls')), # new
 ]

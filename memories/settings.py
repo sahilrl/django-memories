@@ -133,5 +133,4 @@ AUTH_USER_MODEL = 'main.User'
 # redirect login_required setting
 LOGIN_URL = 'login'
 # redirect after loggin in
-LOGIN_REDIRECT_URL = '/'
-REDIRECT_FIELD_NAME = 'home'
+# LOGIN_REDIRECT_URL = 'home'
