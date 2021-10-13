@@ -106,16 +106,10 @@ def signup(request):
             user_id = uuid.uuid4()
             if not image is None:
                 image.name = f'{user_id}.jpg'
-
-
-
-            # left here
-
-
             if password != confirm_password:
                 form.add_error(None, 'password mismatched')
-                form.non_field_errors()
                 print(form.non_field_errors())
+                return render(request, 'registration/register.html', {'form': form, 'form.non_field_errors()':form.non_field_errors()})
                 
             user = User.objects.create_user(email,password, name=name, image=image, user_id=user_id)
             return HttpResponse('success')
