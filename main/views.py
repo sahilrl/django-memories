@@ -101,11 +101,22 @@ def signup(request):
             name = form.cleaned_data['name']
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
+            confirm_password = form.cleaned_data['confirm_password']
             image = form.cleaned_data['image']
             user_id = uuid.uuid4()
-            image.name = f'{user_id}.jpg'
-            print(image.name, user_id)
-            print(email,password, name, password, image)
+            if not image is None:
+                image.name = f'{user_id}.jpg'
+
+
+
+            # left here
+
+
+            if password != confirm_password:
+                form.add_error(None, 'password mismatched')
+                form.non_field_errors()
+                print(form.non_field_errors())
+                
             user = User.objects.create_user(email,password, name=name, image=image, user_id=user_id)
             return HttpResponse('success')
             
