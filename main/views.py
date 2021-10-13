@@ -1,7 +1,4 @@
 from django.contrib.auth.decorators import login_required
-from types import FrameType
-from typing import get_type_hints
-from django.db.models.fields import EmailField
 from django.http import response
 from django.http.response import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
@@ -14,22 +11,32 @@ import shutil # to save image on computer
 from django.conf import settings
 from .backends import UserBackend
 from django.contrib.auth import login
-from .forms import LoginForm
+from .forms import LoginForm, RegisterForm
 from django.contrib.auth.views import LoginView
+from .decorators import login_excluded
 Backend = UserBackend()
 from django.conf import settings
+import uuid
+
 # from urllib.request import urlopen
 
-@login_required
+@login_required()
 def home(request):
     user = request.user
     user_id = user.user_id
     data = User.objects.filter(user_id=user_id)
+    # media_base_dir = {settings.MEDIA_ROOT}
+    # print(media_base_dir)
+    for person in data:
+        print(person.image)
     dict = {'user_id':user_id,
             'data':data}
     return render(request, 'main/app.html', dict)
 
+@login_excluded('home')
 def login_normal(request):
+    # next = request.GET.get('next', None)
+    # print('the result: ',next)
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
@@ -37,24 +44,22 @@ def login_normal(request):
             password = form.cleaned_data['password']
             print(email,password)
             user = Backend.authenticate(request,email=email, password=password)
-            print(user.is_authenticated)
+            # print(user.is_authenticated)
             if user.is_authenticated == True:
                 login(request, user)
-                return redirect('home')
-            
+                return redirect(home)
     else:
         form = LoginForm()
     return render(request, 'registration/login.html', {'form': form})
 
+@login_excluded('home')
 def login_facebook(request):  
     app_id = config('app-id')
     app_secret = config('app-secret')
     if (request.get_full_path_info() == "/login_facebook/"):
         return HttpResponseRedirect(f'https://www.facebook.com/v11.0/dialog/oauth?client_id={app_id}&redirect_uri=http://localhost:8000/login_facebook/&state={"{st=state123abc,ds=123456789}&scope=email"}')
     else:
-        req = urlparse(request.get_full_path_info())
-        req = req.query.split('&')
-        req = req[0].replace('code=','')
+        req = request.GET.get('code')
         access_token = requests.get(f'https://graph.facebook.com/v11.0/oauth/access_token?client_id={app_id}&redirect_uri=http://localhost:8000/login_facebook/&client_secret={app_secret}&code={req}')
         access_token = access_token.json().get("access_token")
         print(access_token)
@@ -70,10 +75,10 @@ def login_facebook(request):
 
         defaults={'name':name, 'email':email, 'access_token':access_token, 'user_id':user_id}
         if picture.status_code == 200:
-            picture_name = f'main/profiles/{user_id}.jpg'
+            picture_name = f'profiles/facebook/{user_id}.jpg'
             picture.raw.decode_content = True
 
-            with open(f'{settings.BASE_DIR}/main/static/{picture_name}', 'wb') as f:
+            with open(f'{settings.MEDIA_ROOT}/{picture_name}', 'wb') as f:
                 shutil.copyfileobj(picture.raw, f)
 
             defaults['image'] = picture_name
@@ -86,3 +91,25 @@ def login_facebook(request):
     return redirect('home')
 
 
+@login_excluded('home')
+def signup(request):
+    # next = request.GET.get('next', None)
+    # print('the result: ',next)
+    if request.method == 'POST':
+        form = RegisterForm(request.POST, request.FILES)
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
+            image = form.cleaned_data['image']
+            user_id = uuid.uuid4()
+            image.name = f'{user_id}.jpg'
+            print(image.name, user_id)
+            print(email,password, name, password, image)
+            user = User.objects.create_user(email,password, name=name, image=image, user_id=user_id)
+            return HttpResponse('success')
+            
+    else:
+        form = RegisterForm()
+    return render(request, 'registration/register.html', {'form': form})
+    

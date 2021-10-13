@@ -48,7 +48,7 @@ class User(AbstractBaseUser):
     user_id = models.CharField(primary_key=True, unique=True, default=uuid.uuid4, max_length=50)
     name = models.CharField(max_length=500)
     email = models.EmailField(verbose_name='email address', max_length=255, unique=True)
-    image = models.CharField(max_length=500, default='/main/profiles/default.jpg')
+    image = models.FileField(upload_to=f'profiles/', max_length=500, default='/profiles/defaults/default.jpg')
     access_token = models.CharField(max_length=500)
     password = models.CharField(max_length=500, null=True, blank=True) 
 
@@ -62,6 +62,7 @@ class User(AbstractBaseUser):
 
 class Messages(models.Model):
     message = models.TextField(null=True, blank=True)
-    Location = models.CharField(max_length=500, null=True, blank=True)
+    latitude = models.FloatField(max_length=500, null=True, blank=True)
+    longitude = models.FloatField(max_length=500, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
