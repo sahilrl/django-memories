@@ -37,12 +37,15 @@
       </div>
     </div>
   </div>
-  {% if form.errors %}
+{% if form.non_field_errors %}
   {% for error in form.non_field_errors %}
     <p>{{error}}</p>
   {% endfor %}
-  <p>Your username and password didn't match. Please try again.</p>
 {% endif %}
+
+<!-- {% if form.errors %}
+  <p>Your username and password didn't match. Please try again.</p>
+{% endif %} -->
 
 {% if next %}
   {% if user.is_authenticated %}
