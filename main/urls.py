@@ -25,4 +25,6 @@ urlpatterns = [
     path('register/', views.signup, name='signup'),
     # path('accounts/', include('django.contrib.auth.urls')), # new
     path('activate/<uidb64>/<token>', views.activate, name='activate'),
+    path('reset/', views.forget_password, name='reset'),
+    path('reset-password/<uidb64>/<token>', views.setnewpass, name='setnewpass'),
 ]

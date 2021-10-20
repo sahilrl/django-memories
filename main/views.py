@@ -6,12 +6,14 @@ from django.shortcuts import redirect
 from urllib.parse import urlparse
 from decouple import config
 import requests
+
+from main.forms import ForgetPass
 from .models import User
 import shutil # to save image on computer
 from django.conf import settings
 from .backends import UserBackend
 from django.contrib.auth import login
-from .forms import LoginForm, RegisterForm
+from .forms import LoginForm, RegisterForm, ForgetPass, PassReset
 from django.contrib.auth.views import LoginView
 from .decorators import login_excluded
 Backend = UserBackend()
@@ -34,8 +36,6 @@ def home(request):
     data = User.objects.filter(user_id=user_id)
     # media_base_dir = {settings.MEDIA_ROOT}
     # print(media_base_dir)
-    for person in data:
-        print(person.image)
     dict = {'user_id':user_id,
             'data':data}
     return render(request, 'main/app.html', dict)
@@ -110,7 +110,6 @@ def signup(request):
             if password != confirm_password:
                 form.add_error(None, 'password mismatched')
                 return render(request, 'registration/register.html', {'form': form})
-
             is_active = False
             user = User.objects.create_user(email,password, name=name, image=image, user_id=user_id, is_active=is_active)
             # current_site = get_current_site(request)
@@ -146,3 +145,55 @@ def activate(request, uidb64, token):
         return redirect('home')
     else:
         return HttpResponse('Activation link is invalid!')
+
+    
+def forget_password(request):
+    print(request)
+    if request.method == 'POST':
+        form = ForgetPass(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            user = Backend.get_user_by_natural_key(email)
+            if user is not None:
+                mail_subject = 'Reset Password for Memories App Account'
+                message = render_to_string('reset_password.html', {
+                'user': user,
+                'domain': 'localhost:8000', # domain name
+                'uid': urlsafe_base64_encode(force_bytes(user.user_id)),
+                'token':account_activation_token.make_token(user),
+                })
+                email_sent = EmailMessage(mail_subject, message, to=[email])
+                email_sent.content_subtype = "html" 
+                email_sent.send()
+        return HttpResponse('Please check your email to confirm your account')
+
+    else:
+        form = ForgetPass()
+        return render(request, 'registration/passreset.html', {'form':form})
+
+    
+@login_excluded('home')
+def setnewpass(request, uidb64, token):
+    if request.method == 'POST':
+        uid = force_text(urlsafe_base64_decode(uidb64))
+        user = Backend.get_user(user_id=uid)
+        form = PassReset(request.POST)
+        if form.is_valid():
+            password = form.cleaned_data['password']
+            confirm_password = form.cleaned_data['confirm_password']
+            if password == confirm_password:
+                
+                print(password)
+                user.set_password(password)
+                return HttpResponse('okay')
+    else:
+        try:
+            uid = force_text(urlsafe_base64_decode(uidb64))
+            user = Backend.get_user(user_id=uid)
+            print(user)
+            if user is not None and account_activation_token.check_token(user, token):
+                form = PassReset()
+            return render(request, 'registration/set-new-pass.html', {'form':form, 'uid':uidb64, 'token':None})
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            user = None
+    return HttpResponse('Password Reset link is invalid!')

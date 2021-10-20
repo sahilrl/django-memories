@@ -38,3 +38,9 @@ class UserBackend(BaseBackend):
                 return User.objects.get(user_id=user_id)
             except User.DoesNotExist:
                 return None
+    def get_user_by_natural_key(self, email):
+        try:
+            return User.objects.get(email=email)
+        except User.DoesNotExist:
+            return None
+        
