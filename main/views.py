@@ -50,7 +50,7 @@ def login_normal(request):
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
             user = Backend.authenticate(request,email=email, password=password)
-            if user.is_authenticated == True:
+            if user is not None and user.is_authenticated == True:
                 login(request, user)
                 return redirect(home)
     else:
@@ -182,18 +182,21 @@ def setnewpass(request, uidb64, token):
             password = form.cleaned_data['password']
             confirm_password = form.cleaned_data['confirm_password']
             if password == confirm_password:
-                
-                print(password)
                 user.set_password(password)
-                return HttpResponse('okay')
+                user.save()
+                return redirect('home')
+        else:
+            print('form is invalid')
     else:
         try:
             uid = force_text(urlsafe_base64_decode(uidb64))
             user = Backend.get_user(user_id=uid)
             print(user)
             if user is not None and account_activation_token.check_token(user, token):
+                print('if executed')
                 form = PassReset()
             return render(request, 'registration/set-new-pass.html', {'form':form, 'uid':uidb64, 'token':None})
         except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            print('error encountered')
             user = None
     return HttpResponse('Password Reset link is invalid!')
