@@ -1,40 +1,3 @@
-// CREATING MAP
-
-var myMap;
-
-// Waiting for the API to load and DOM to be ready.
-ymaps.ready(init);
-
-function init () {
-    /**
-     * Creating an instance of the map and binding it to the container
-     * with the specified ID ("map").
-     */
-    myMap = new ymaps.Map('map', {
-        /**
-         * When initializing the map, you must specify
-         * its center and the zoom factor.
-         */
-        center: [55.76, 37.64], // Moscow
-        zoom: 10
-    }, {
-        searchControlProvider: 'yandex#search'
-    });
-
-    document.getElementById('destroyButton').onclick = function () {
-        // To destroy it, the "destroy" method is used.
-        myMap.destroy();
-    };
-
-}
-
-
-
-
-
-
-// PLACEMARKER
-
 ymaps.ready(init);
 
 function init() {
@@ -45,104 +8,102 @@ function init() {
             searchControlProvider: 'yandex#search'
         }),
 
-    // Creating a geo object with the "Point" geometry type.
+    // Создаем геообъект с типом геометрии "Точка".
         myGeoObject = new ymaps.GeoObject({
-            // The geometry description.
+            // Описание геометрии.
             geometry: {
                 type: "Point",
                 coordinates: [55.8, 37.8]
             },
-            // Properties.
+            // Свойства.
             properties: {
-                // The placemark content.
-                iconContent: 'I\'m draggable',
-                hintContent: 'Come on, drag already!'
+                // Контент метки.
+                iconContent: 'Я тащусь',
+                hintContent: 'Ну давай уже тащи'
             }
         }, {
-            /**
-             * Options.
-             * The placemark's icon will stretch to fit its contents.
-             */
+            // Опции.
+            // Иконка метки будет растягиваться под размер ее содержимого.
             preset: 'islands#blackStretchyIcon',
-            // The placemark can be dragged.
+            // Метку можно перемещать.
             draggable: true
         }),
         myPieChart = new ymaps.Placemark([
             55.847, 37.6
         ], {
-            // Data for generating a diagram.
+            // Данные для построения диаграммы.
             data: [
                 {weight: 8, color: '#0E4779'},
                 {weight: 6, color: '#1E98FF'},
                 {weight: 4, color: '#82CDFF'}
             ],
-            iconCaption: "Diagram"
+            iconCaption: "Диаграмма"
         }, {
-            // Defining a custom placemark layout.
+            // Зададим произвольный макет метки.
             iconLayout: 'default#pieChart',
-            // Radius of the diagram, in pixels.
+            // Радиус диаграммы в пикселях.
             iconPieChartRadius: 30,
-            // The radius of the central part of the layout.
+            // Радиус центральной части макета.
             iconPieChartCoreRadius: 10,
-            // Fill style for the core.
+            // Стиль заливки центральной части.
             iconPieChartCoreFillStyle: '#ffffff',
-            // The style for lines between sectors and the outline of the diagram.
+            // Cтиль линий-разделителей секторов и внешней обводки диаграммы.
             iconPieChartStrokeStyle: '#ffffff',
-            // Width of the sector dividing lines and diagram outline.
+            // Ширина линий-разделителей секторов и внешней обводки диаграммы.
             iconPieChartStrokeWidth: 3,
-            // Maximum width of the placemark caption.
+            // Максимальная ширина подписи метки.
             iconPieChartCaptionMaxWidth: 200
         });
 
     myMap.geoObjects
-        .add(myGeoObject)
-        .add(myPieChart)
-        .add(new ymaps.Placemark([55.684758, 37.738521], {
-            balloonContent: 'the color of <strong>the water on Bondi Beach</strong>'
-        }, {
-            preset: 'islands#icon',
-            iconColor: '#0095b6'
-        }))
-        .add(new ymaps.Placemark([55.833436, 37.715175], {
-            balloonContent: '<strong>greyish-brownish-maroon</strong> color'
-        }, {
-            preset: 'islands#dotIcon',
-            iconColor: '#735184'
-        }))
-        .add(new ymaps.Placemark([55.687086, 37.529789], {
-            balloonContent: 'the color of <strong>enamored toads</strong>'
-        }, {
-            preset: 'islands#circleIcon',
-            iconColor: '#3caa3c'
-        }))
-        .add(new ymaps.Placemark([55.782392, 37.614924], {
-            balloonContent: 'the color of <strong>Surprise Dauphin</strong>'
-        }, {
-            preset: 'islands#circleDotIcon',
-            iconColor: 'yellow'
-        }))
+        // .add(myGeoObject)
+        // .add(myPieChart)
+        // .add(new ymaps.Placemark([55.684758, 37.738521], {
+        //     balloonContent: 'цвет <strong>воды пляжа бонди</strong>'
+        // }, {
+        //     preset: 'islands#icon',
+        //     iconColor: '#0095b6'
+        // }))
+        // .add(new ymaps.Placemark([55.833436, 37.715175], {
+        //     balloonContent: '<strong>серобуромалиновый</strong> цвет'
+        // }, {
+        //     preset: 'islands#dotIcon',
+        //     iconColor: '#735184'
+        // }))
+        // .add(new ymaps.Placemark([55.687086, 37.529789], {
+        //     balloonContent: 'цвет <strong>влюбленной жабы</strong>'
+        // }, {
+        //     preset: 'islands#circleIcon',
+        //     iconColor: '#3caa3c'
+        // }))
+        // .add(new ymaps.Placemark([55.782392, 37.614924], {
+        //     balloonContent: 'цвет <strong>детской неожиданности</strong>'
+        // }, {
+        //     preset: 'islands#circleDotIcon',
+        //     iconColor: 'yellow'
+        // }))
         .add(new ymaps.Placemark([55.642063, 37.656123], {
-            balloonContent: '<strong>red</strong> color'
+            balloonContent: 'цвет <strong>красный</strong>'
         }, {
             preset: 'islands#redSportIcon'
         }))
-        .add(new ymaps.Placemark([55.826479, 37.487208], {
-            balloonContent: '<strong>Facebook</strong> color'
-        }, {
-            preset: 'islands#governmentCircleIcon',
-            iconColor: '#3b5998'
-        }))
-        .add(new ymaps.Placemark([55.694843, 37.435023], {
-            balloonContent: '<strong>crocodile\'s nose</strong> color',
-            iconCaption: 'Really, really long but super interesting text'
-        }, {
-            preset: 'islands#greenDotIconWithCaption'
-        }))
-        .add(new ymaps.Placemark([55.790139, 37.814052], {
-            balloonContent: '<strong>blue</strong> color',
-            iconCaption: 'Really, really long but super interesting text'
-        }, {
-            preset: 'islands#blueCircleDotIconWithCaption',
-            iconCaptionMaxWidth: '50'
-        }));
+        // .add(new ymaps.Placemark([55.826479, 37.487208], {
+        //     balloonContent: 'цвет <strong>фэйсбука</strong>'
+        // }, {
+        //     preset: 'islands#governmentCircleIcon',
+        //     iconColor: '#3b5998'
+        // }))
+        // .add(new ymaps.Placemark([55.694843, 37.435023], {
+        //     balloonContent: 'цвет <strong>носика Гены</strong>',
+        //     iconCaption: 'Очень длиннный, но невероятно интересный текст'
+        // }, {
+        //     preset: 'islands#greenDotIconWithCaption'
+        // }))
+        // .add(new ymaps.Placemark([55.790139, 37.814052], {
+        //     balloonContent: 'цвет <strong>голубой</strong>',
+        //     iconCaption: 'Очень длиннный, но невероятно интересный текст'
+        // }, {
+        //     preset: 'islands#blueCircleDotIconWithCaption',
+        //     iconCaptionMaxWidth: '50'
+        // }));
 }

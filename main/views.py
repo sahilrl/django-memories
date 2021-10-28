@@ -35,15 +35,12 @@ def home(request):
     user_id = user.user_id
     data = User.objects.filter(user_id=user_id)
     # media_base_dir = {settings.MEDIA_ROOT}
-    # print(media_base_dir)
     dict = {'user_id':user_id,
             'data':data}
     return render(request, 'main/app.html', dict)
 
 @login_excluded('home')
 def login_normal(request):
-    # next = request.GET.get('next', None)
-    # print('the result: ',next)
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
@@ -148,7 +145,6 @@ def activate(request, uidb64, token):
 
     
 def forget_password(request):
-    print(request)
     if request.method == 'POST':
         form = ForgetPass(request.POST)
         if form.is_valid():
@@ -185,18 +181,13 @@ def setnewpass(request, uidb64, token):
                 user.set_password(password)
                 user.save()
                 return redirect('home')
-        else:
-            print('form is invalid')
     else:
         try:
             uid = force_text(urlsafe_base64_decode(uidb64))
             user = Backend.get_user(user_id=uid)
-            print(user)
             if user is not None and account_activation_token.check_token(user, token):
-                print('if executed')
                 form = PassReset()
             return render(request, 'registration/set-new-pass.html', {'form':form, 'uid':uidb64, 'token':None})
         except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-            print('error encountered')
             user = None
     return HttpResponse('Password Reset link is invalid!')
